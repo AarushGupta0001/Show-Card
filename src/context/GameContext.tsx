@@ -23,7 +23,8 @@ export type Action =
   | { type: 'ADD_GROUP'; playerId: string }
   | { type: 'REMOVE_GROUP'; playerId: string; groupId: string }
   | { type: 'EDIT_ROUND'; roundIndex: number }
-  | { type: 'UPDATE_PLAYER_NAME'; playerId: string; name: string };
+  | { type: 'UPDATE_PLAYER_NAME'; playerId: string; name: string }
+  | { type: 'SET_ROLE'; playerId: string; role: 'show' | 'others' };
 
 interface GameContextValue {
   state: GameState;
@@ -151,6 +152,14 @@ function applyAction(state: GameState, action: Action): GameState {
             p.id === action.playerId ? { ...p, name: action.name } : p
           ),
         },
+      };
+
+    case 'SET_ROLE':
+      return {
+        ...state,
+        draftEntries: state.draftEntries.map((e) =>
+          e.playerId === action.playerId ? { ...e, role: action.role } : e
+        ),
       };
 
     default:

@@ -30,7 +30,7 @@ function CardTile({ card, onClick }: { card: CardValue; onClick: () => void }) {
     <button
       type="button"
       className="card-tile"
-      style={{ height: '76px', width: '100%' }}
+      style={{ height: '90px', width: '100%' }}
       onClick={onClick}
       aria-label={`Select card ${card} (value ${val})`}
     >
@@ -220,6 +220,20 @@ export default function PlayerCard({ player }: PlayerCardProps) {
     if (activeGroupId === groupId) setActiveGroupId(entry.groups[0]?.id ?? null);
   };
   const toggleDouble = () => dispatch({ type: 'TOGGLE_DOUBLE', playerId: player.id });
+  const setRole = (role: 'show' | 'others') => {
+    dispatch({ type: 'SET_ROLE', playerId: player.id, role });
+  };
+
+  useEffect(() => {
+    if (isOpen && entry) {
+      const totalCards = entry.groups.reduce((acc, g) => acc + g.cards.length, 0);
+      if (entry.role === 'show' && totalCards >= 3) {
+        setIsOpen(false);
+      } else if (entry.role === 'others' && totalCards >= 9) {
+        setIsOpen(false);
+      }
+    }
+  }, [isOpen, entry]);
 
   return (
     <>
@@ -282,8 +296,26 @@ export default function PlayerCard({ player }: PlayerCardProps) {
 
             <div className="px-5 pb-6 space-y-4 pt-4">
 
-              {/* ── Toggles row ── */}
+              {/* ── Role Selection ── */}
               <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setRole('show')}
+                  className={`p-4 rounded-2xl flex flex-col items-center justify-center transition-all ${entry.role === 'show' ? 'ring-2 ring-indigo-400 bg-indigo-500/20' : 'bg-[var(--bg-card)] border border-[rgba(255,255,255,0.07)]'}`}
+                >
+                  <span className="text-lg font-black mb-1">Show</span>
+                  <span className="text-[10px] text-slate-400">Auto-save at 3 cards</span>
+                </button>
+                <button
+                  onClick={() => setRole('others')}
+                  className={`p-4 rounded-2xl flex flex-col items-center justify-center transition-all ${entry.role === 'others' ? 'ring-2 ring-amber-400 bg-amber-500/20' : 'bg-[var(--bg-card)] border border-[rgba(255,255,255,0.07)]'}`}
+                >
+                  <span className="text-lg font-black mb-1">Others</span>
+                  <span className="text-[10px] text-slate-400">Auto-save at 9 cards</span>
+                </button>
+              </div>
+
+              {/* ── Toggles row ── */}
+              <div className="grid grid-cols-1 gap-3">
                 {/* Collection mode */}
                 <div className="rounded-2xl p-3.5 flex items-center justify-between gap-2"
                      style={{ background: collectionMode ? 'rgba(99,102,241,0.1)' : 'var(--bg-card)', border: `1px solid ${collectionMode ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.07)'}` }}>
@@ -300,21 +332,6 @@ export default function PlayerCard({ player }: PlayerCardProps) {
                   </button>
                 </div>
 
-                {/* Double score */}
-                <div className="rounded-2xl p-3.5 flex items-center justify-between gap-2"
-                     style={{ background: entry.doubleScore ? 'rgba(245,158,11,0.08)' : 'var(--bg-card)', border: `1px solid ${entry.doubleScore ? 'rgba(245,158,11,0.3)' : 'rgba(255,255,255,0.07)'}` }}>
-                  <div>
-                    <p className="text-xs font-bold text-amber-400 leading-tight">Double ×2</p>
-                    <p className="text-[10px] text-slate-500 leading-tight mt-0.5">Multiply score</p>
-                  </div>
-                  <button
-                    onClick={toggleDouble}
-                    id={`double-score-${player.id}`}
-                    className={`toggle toggle-amber ${entry.doubleScore ? 'on' : 'off'}`}
-                  >
-                    <span className={`toggle-thumb ${entry.doubleScore ? 'on' : 'off'}`} />
-                  </button>
-                </div>
               </div>
 
               {/* ── Group tabs (collection mode) ── */}
@@ -374,14 +391,48 @@ export default function PlayerCard({ player }: PlayerCardProps) {
               </div>
 
               {/* ── Card Grid — LARGE TILES ── */}
-              <div>
-                <p className="text-xs text-slate-500 font-semibold mb-3 uppercase tracking-wider">Select a Card</p>
-                <div className="grid grid-cols-7 gap-2">
-                  {ALL_CARDS.map((card) => (
-                    <CardTile key={card} card={card} onClick={() => addCard(card)} />
-                  ))}
+              {!entry.role ? (
+                <div className="py-8 text-center text-slate-500 text-sm font-semibold rounded-2xl border border-dashed border-[rgba(255,255,255,0.1)]">
+                  Please select Show or Others above to continue
                 </div>
-              </div>
+              ) : (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Select a Card</p>
+                    
+                    {/* ── Circular x2 Button ── */}
+                    <button
+                      onClick={toggleDouble}
+                      className={`w-11 h-11 rounded-full flex items-center justify-center font-black text-sm transition-all ${entry.doubleScore ? 'bg-amber-500 text-white shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 'bg-[var(--bg-card)] text-slate-400 border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)]'}`}
+                    >
+                      x2
+                    </button>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    <div className="grid grid-cols-4 gap-2">
+                      {ALL_CARDS.slice(0, 4).map((card) => (
+                        <CardTile key={card} card={card} onClick={() => addCard(card)} />
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {ALL_CARDS.slice(4, 7).map((card) => (
+                        <CardTile key={card} card={card} onClick={() => addCard(card)} />
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {ALL_CARDS.slice(7, 10).map((card) => (
+                        <CardTile key={card} card={card} onClick={() => addCard(card)} />
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {ALL_CARDS.slice(10, 13).map((card) => (
+                        <CardTile key={card} card={card} onClick={() => addCard(card)} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* ── Total score bar ── */}
               {hasCards && (

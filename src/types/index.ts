@@ -16,6 +16,7 @@ export interface CardGroup {
 
 export interface PlayerRoundEntry {
   playerId: string;
+  role?: 'show' | 'others';
   /** groups of cards (normal mode = 1 group, collection = multiple) */
   groups: CardGroup[];
   doubleScore: boolean;
