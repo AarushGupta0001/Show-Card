@@ -29,25 +29,25 @@ function CardTile({ card, onClick }: { card: CardValue; onClick: () => void }) {
   return (
     <button
       type="button"
-      className="card-tile"
-      style={{ height: '90px', width: '100%' }}
+      className="card-tile w-full"
+      style={{ height: '76px' }}
       onClick={onClick}
       aria-label={`Select card ${card} (value ${val})`}
     >
       {/* Top-left label */}
-      <div className="absolute top-1.5 left-2 flex flex-col items-center leading-none">
+      <div className="absolute top-1.5 left-1.5 sm:left-2 flex flex-col items-center leading-none">
         <span className={`font-black text-sm leading-none ${isRed ? 'suit-red' : 'suit-black'}`}>{card}</span>
       </div>
 
       {/* Center suit — big */}
       <div className="flex items-center justify-center w-full h-full">
-        <span className={`text-2xl leading-none select-none ${isRed ? 'suit-red' : 'suit-black'}`}>
+        <span className={`text-xl sm:text-2xl leading-none select-none ${isRed ? 'suit-red' : 'suit-black'}`}>
           {suit}
         </span>
       </div>
 
       {/* Bottom value */}
-      <div className="absolute bottom-1.5 right-2">
+      <div className="absolute bottom-1.5 right-1.5 sm:right-2">
         <span className="text-[10px] font-bold text-slate-600">{val}</span>
       </div>
     </button>
@@ -257,7 +257,7 @@ export default function PlayerCard({ player }: PlayerCardProps) {
             ref={sheetRef}
             className="relative w-full sm:max-w-lg anim-slide-up overflow-y-auto"
             style={{
-              maxHeight: '94dvh',
+              maxHeight: '85dvh',
               background: 'var(--bg-surface)',
               borderRadius: '28px 28px 0 0',
               border: '1.5px solid rgba(99,102,241,0.25)',
@@ -294,7 +294,7 @@ export default function PlayerCard({ player }: PlayerCardProps) {
               </button>
             </div>
 
-            <div className="px-5 pb-6 space-y-4 pt-4">
+            <div className="px-4 sm:px-5 pb-8 sm:pb-6 space-y-4 pt-4">
 
               {/* ── Role Selection ── */}
               <div className="grid grid-cols-2 gap-3">
@@ -410,23 +410,8 @@ export default function PlayerCard({ player }: PlayerCardProps) {
                   </div>
                   
                   <div className="flex flex-col gap-2">
-                    <div className="grid grid-cols-4 gap-2">
-                      {ALL_CARDS.slice(0, 4).map((card) => (
-                        <CardTile key={card} card={card} onClick={() => addCard(card)} />
-                      ))}
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {ALL_CARDS.slice(4, 7).map((card) => (
-                        <CardTile key={card} card={card} onClick={() => addCard(card)} />
-                      ))}
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {ALL_CARDS.slice(7, 10).map((card) => (
-                        <CardTile key={card} card={card} onClick={() => addCard(card)} />
-                      ))}
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {ALL_CARDS.slice(10, 13).map((card) => (
+                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                      {ALL_CARDS.map((card) => (
                         <CardTile key={card} card={card} onClick={() => addCard(card)} />
                       ))}
                     </div>
